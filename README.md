@@ -8,10 +8,8 @@ Implementation of a vanilla Transformer from scratch using only `numpy`. The pri
 - [Motivation](#motivation)
 - [Project Structure](#project-structure)
 - [Installation](#installation)
-- [Usage](#usage)
 - [Experiments](#experiments)
 - [Contributing](#contributing)
-- [License](#license)
 
 ## Introduction
 
