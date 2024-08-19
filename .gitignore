@@ -1,1 +1,3 @@
 data/arxiv_abstracts
+.DS_Store
+.vector_cache
