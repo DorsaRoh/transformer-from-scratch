@@ -1,6 +1,6 @@
 # Transformer from Scratch
 
-Implementation of a vanilla Transformer from scratch using only `numpy`. The primary objective is to investigate whether large language models built on artificial neural networks can support consciousness. 
+Implementation of a vanilla Transformer from scratch using only numpy. The primary objective is to investigate whether large language models built on artificial neural networks can support consciousness. 
 
 ## Table of Contents
 
