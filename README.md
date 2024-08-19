@@ -17,7 +17,7 @@ This project demonstrates a foundational implementation of the Transformer archi
 
 ## Motivation
 
-The central question driving this project is: **Can LLMs built on ANNs support consciousness?** While the concept of consciousness in machines is still theoretical, this project aims to address the computational capabilities of LLMs by constructing them from the ground up. The focus is on understanding the relationship between the structure of Transformers and the possibility of emergent properties like consciousness.
+The central question driving this project is: **Can LLMs built on ANNs support consciousness?** While the concept of consciousness in machines is still theoretical, this project aims to address the computational capabilities of LLMs by constructing them from the ground up. The focus is on understanding the relationship between the structure of Transformers and the possibility of emergent properties, such as higher cognitive function in the brain.
 
 ## Project Structure
 
