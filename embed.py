@@ -7,6 +7,17 @@ import gensim.downloader as api
 
 
 
+
+
+# Part 1: Tokenize, embed, positional encode
+
+# Steps:
+    # 1. load the embedding matrix
+    # 2. split input sentence into words (tokens)
+    # 3. create an array of embeddings of the tokens of the input sentence
+    # 4. add positional encoding to the token embeddings
+
+
 # embedding matrix
 embedding_model = api.load('glove-wiki-gigaword-300')
 
@@ -43,7 +54,7 @@ def add_positional_encoding(embeddings: np.ndarray) -> np.ndarray:
     return embeddings_with_pos
 
 
-print(add_positional_encoding(tokenize_and_embed("this is a test", embedding_model)))
+# print(add_positional_encoding(tokenize_and_embed("this is a test", embedding_model)))
 
 
 
