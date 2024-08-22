@@ -2,23 +2,24 @@ import numpy as np
 import gensim.downloader as api
 
 
-# goal: with a string of input (ex. a sentence), next word is predicted.
-#       should be able to form/complete a coherent sentence
-
-
+# Goal: with a string of input (ex. a sentence), next word is predicted.
+#       Should be able to form/complete a coherent sentence
 
 
 
 # Part 1: Tokenize, embed, positional encode
 
 # Steps:
-    # 1. load the embedding matrix
-    # 2. split input sentence into words (tokens)
-    # 3. create an array of embeddings of the tokens of the input sentence
-    # 4. add positional encoding to the token embeddings
+    # Self Attention
+        # 1. Load the embedding matrix
+        # 2. Split input sentence into words (tokens)
+        # 3. Create an array of embeddings of the tokens of the input sentence
+        # 4. Add positional encoding to the token embeddings
+    # Multi-Head Attention
+        # 1. 
 
 
-# embedding matrix
+# Embedding matrix
 embedding_model = api.load('glove-wiki-gigaword-300')
 
 
@@ -37,10 +38,10 @@ def add_positional_encoding(embeddings: np.ndarray) -> np.ndarray:
     sequence_len = embeddings.shape[0]
     embedding_dim = embeddings.shape[1]
 
-    # initialize  positional encoding matrix
+    # Initialize  positional encoding matrix
     pos_enc_matrix = np.zeros((sequence_len, embedding_dim))
 
-    # calculate the positional encodings
+    # Calculate the positional encodings
     for pos in range(sequence_len):
         for i in range(embedding_dim): 
             # even index
@@ -49,7 +50,7 @@ def add_positional_encoding(embeddings: np.ndarray) -> np.ndarray:
             else: # odd index
                 pos_enc_matrix[pos, i] = np.cos(pos/(10000**(i/ embedding_dim)))
 
-    # add positional encodings
+    # Add positional encodings
     embeddings_with_pos = embeddings + pos_enc_matrix
     return embeddings_with_pos
 
