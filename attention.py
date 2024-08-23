@@ -11,10 +11,10 @@ from embed import get_embedding
     # 1. Create weight matrices (intialized randomly initally. same dimensions as embeddings)
     # 2. Get Query, Key values from embed.py (i.e. linear transformation applied to the vectors of the (word embeddings & positional encoding) with weight matrices, for each token)
     # 3. Calculate the attention score (dot product of the Query and Key matrices)
-    # 4. Apply masking to the attention scores
+    # 4. Masking (optional here)
     # 5. Apply softmax to the (masked) attention scores (this is called normalization)
     # 6. Use attention scores to weight the Value vectors
-    # 7. Return step 6.
+    # 7. Return step 5.
 
 
 
@@ -28,13 +28,17 @@ class SelfAttention:
         self.W_v = np.random.rand(embedding_dim, embedding_dim)
 
     # compute Query, Key, and Value matrices
-    def forward(self, embeddings):
+    def forward(self, embeddings, mask=None):
         query = np.dot(embeddings, self.W_q)
         key = np.dot(embeddings, self.W_k)
         values = np.dot(embeddings, self.W_v)
 
         # calculate attention scores
         attention_scores = self.calculate_attention_score(query, key)
+
+        # masking
+        if mask is not None:
+            attention_scores = np.where(mask == 0, -1e9, attention_scores)      # where mask is 0, turns to -infinity. where mask is 1, keeps original values
 
         # apply softmax to attention scores
         attention_weights = self.softmax(attention_scores)
@@ -43,11 +47,14 @@ class SelfAttention:
         output = self.values_weighted_sum(attention_weights, values)
 
         return output
+    
 
     # attention scores
     def calculate_attention_score(self, query, key):
-        return np.dot(query, key.T) # transpose of the key matrix 
+        d_k = key.shape[-1]     # scaling factor to ensure no too large values are fed to softmax (would push softmax into regions where it has extremely small gradients)
+        dot = np.dot(query, key.T) # key.T : transpose of the key matrix 
                                     # i.e. flipping the matrix over its diagonal, so that the rows become columns and the colums become rows
+        return dot / d_k
     
     # normalization
     def softmax(self, scores):
@@ -76,39 +83,39 @@ class SelfAttention:
         # To combine the information from all heads into a single output
 
 
-class MultiHeadAttention:
-    def __init__(self, embedding_dim, num_heads):
-        self.embedding_dim = embedding_dim
-        self.num_heads = num_heads
+# class MultiHeadAttention:
+#     def __init__(self, embedding_dim, num_heads):
+#         self.embedding_dim = embedding_dim
+#         self.num_heads = num_heads
 
-        # check that embedding_dim is divisible by num_heads
-        assert embedding_dim % num_heads == 0, "Embedding dimension must be divisible by number of heads"
+#         # check that embedding_dim is divisible by num_heads
+#         assert embedding_dim % num_heads == 0, "Embedding dimension must be divisible by number of heads"
         
-        # dimension of each head
-        self.head_dim = embedding_dim // num_heads
+#         # dimension of each head
+#         self.head_dim = embedding_dim // num_heads
 
-        # create multiple SelfAttention heads
-        self.attention_heads = [SelfAttention(self.head_dim) for _ in range(num_heads)]
+#         # create multiple SelfAttention heads
+#         self.attention_heads = [SelfAttention(self.head_dim) for _ in range(num_heads)]
         
-        # weight matrix for the final linear transformation
-        self.W_o = np.random.rand(num_heads * self.head_dim, embedding_dim)
+#         # weight matrix for the final linear transformation
+#         self.W_o = np.random.rand(num_heads * self.head_dim, embedding_dim)
 
 
-    def forward(self, embeddings):
-        # apply each self-attention head
-        head_outputs = [head.forward(embeddings) for head in self.attention_heads]
+#     def forward(self, embeddings):
+#         # apply each self-attention head
+#         head_outputs = [head.forward(embeddings) for head in self.attention_heads]
         
-        # concatenate the outputs of all heads along the last axis
-        concatenated_output = np.concatenate(head_outputs, axis=-1)
+#         # concatenate the outputs of all heads along the last axis
+#         concatenated_output = np.concatenate(head_outputs, axis=-1)
         
-        # apply the final linear transformation
-        output = self.linear_transformation(concatenated_output, self.W_o)
+#         # apply the final linear transformation
+#         output = self.linear_transformation(concatenated_output, self.W_o)
         
-        return output
+#         return output
 
 
-    def linear_transformation(self, concatenated_output, weight_matrix):
-        return np.dot(concatenated_output, weight_matrix)
+#     def linear_transformation(self, concatenated_output, weight_matrix):
+#         return np.dot(concatenated_output, weight_matrix)
 
 
 
