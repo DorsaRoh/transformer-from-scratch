@@ -11,9 +11,11 @@ from embed import get_embedding
     # 1. Create weight matrices (intialized randomly initally. same dimensions as embeddings)
     # 2. Get Query, Key values from embed.py (i.e. linear transformation applied to the vectors of the (word embeddings & positional encoding) with weight matrices, for each token)
     # 3. Calculate the attention score (dot product of the Query and Key matrices)
-    # 4. Apply softmax to the attention scores (normalization)
-    # 5. Use attention scores to weight the Value vectors
-    # 6. Return step 4)
+    # 4. Apply masking to the attention scores
+    # 5. Apply softmax to the (masked) attention scores (this is called normalization)
+    # 6. Use attention scores to weight the Value vectors
+    # 7. Return step 6.
+
 
 
 class SelfAttention:
@@ -128,9 +130,9 @@ print("SelfAttention Output:")
 print(self_attention_output)
 print("Shape:", self_attention_output.shape)
 
-# Test MultiHeadAttention
-multi_head_attention = MultiHeadAttention(embedding_dim, num_heads)
-multi_head_output = multi_head_attention.forward(dummy_embeddings)
-print("MultiHeadAttention Output:")
-print(multi_head_output)
-print("Shape:", multi_head_output.shape)
+# # Test MultiHeadAttention
+# multi_head_attention = MultiHeadAttention(embedding_dim, num_heads)
+# multi_head_output = multi_head_attention.forward(dummy_embeddings)
+# print("MultiHeadAttention Output:")
+# print(multi_head_output)
+# print("Shape:", multi_head_output.shape)

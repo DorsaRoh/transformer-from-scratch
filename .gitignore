@@ -1,3 +1,4 @@
 .DS_Store
 .vector_cache
 __pycache__
+data/arxiv_abstracts
