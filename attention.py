@@ -13,7 +13,7 @@ from embed import get_embedding
     # 3. Calculate the attention score (dot product of the Query and Key matrices)
     # 4. Masking (optional here)
     # 5. Apply softmax to the (masked) attention scores (this is called normalization)
-    # 6. Use attention scores to weight the Value vectors
+    # 6. Use attention scores to weigh the Value vectors
     # 7. Return step 5.
 
 
@@ -22,11 +22,12 @@ class SelfAttention:
     def __init__(self, embedding_dim):
         self.embedding_dim = embedding_dim
 
-        # initialize weight matrices
-        self.W_q = np.random.rand(embedding_dim, embedding_dim)
-        self.W_k = np.random.rand(embedding_dim, embedding_dim)
-        self.W_v = np.random.rand(embedding_dim, embedding_dim)
+        # initialize weight matrices with small random values
+        self.W_q = np.random.randn(embedding_dim, embedding_dim) * np.sqrt(1. / embedding_dim)
+        self.W_k = np.random.randn(embedding_dim, embedding_dim) * np.sqrt(1. / embedding_dim)
+        self.W_v = np.random.randn(embedding_dim, embedding_dim) * np.sqrt(1. / embedding_dim)
 
+        
     # compute Query, Key, and Value matrices
     def forward(self, embeddings, mask=None):
         query = np.dot(embeddings, self.W_q)
@@ -54,7 +55,7 @@ class SelfAttention:
         d_k = key.shape[-1]     # scaling factor to ensure no too large values are fed to softmax (would push softmax into regions where it has extremely small gradients)
         dot = np.dot(query, key.T) # key.T : transpose of the key matrix 
                                     # i.e. flipping the matrix over its diagonal, so that the rows become columns and the colums become rows
-        return dot / d_k
+        return dot / np.sqrt(d_k)  # scale by the square root of the key dimension
     
     # normalization
     def softmax(self, scores):
@@ -83,61 +84,64 @@ class SelfAttention:
         # To combine the information from all heads into a single output
 
 
-# class MultiHeadAttention:
-#     def __init__(self, embedding_dim, num_heads):
-#         self.embedding_dim = embedding_dim
-#         self.num_heads = num_heads
+class MultiHeadAttention:
+    def __init__(self, embedding_dim, num_heads):
 
-#         # check that embedding_dim is divisible by num_heads
-#         assert embedding_dim % num_heads == 0, "Embedding dimension must be divisible by number of heads"
+        # embedding_dim must be divisible by the num_heads
+            # otherwise, the context window will not be consistent (i.e. the input of each head will be different sizes)
+        if embedding_dim % num_heads != 0:
+            raise ValueError("embedding_dim must be divisible by num_heads")
         
-#         # dimension of each head
-#         self.head_dim = embedding_dim // num_heads
-
-#         # create multiple SelfAttention heads
-#         self.attention_heads = [SelfAttention(self.head_dim) for _ in range(num_heads)]
+        # calculate the dimension of each head
+        self.head_dim = embedding_dim // num_heads
         
-#         # weight matrix for the final linear transformation
-#         self.W_o = np.random.rand(num_heads * self.head_dim, embedding_dim)
-
-
-#     def forward(self, embeddings):
-#         # apply each self-attention head
-#         head_outputs = [head.forward(embeddings) for head in self.attention_heads]
+        # initialize heads (instances of self attention class)
+        self.attention_heads = [SelfAttention(self.head_dim) for _ in range(num_heads)]
         
-#         # concatenate the outputs of all heads along the last axis
-#         concatenated_output = np.concatenate(head_outputs, axis=-1)
+        # final transformation matrix (transform the concatenated outputs back to the original embedding dimension)
+        self.W_o = np.random.rand(embedding_dim, embedding_dim)
+
+
+    def forward(self, embeddings):
+        # split the embeddings into multiple heads
+        sequence_length, embedding_dim = embeddings.shape
+        split_embeddings = np.reshape(embeddings, (sequence_length, len(self.attention_heads), self.head_dim))
+
+        head_outputs = []
+        for i, head in enumerate(self.attention_heads):
+            head_output = head.forward(split_embeddings[:, i, :])
+            head_outputs.append(head_output)
         
-#         # apply the final linear transformation
-#         output = self.linear_transformation(concatenated_output, self.W_o)
+        # Concatenate the outputs of all heads along the last axis
+        concatenated_output = np.concatenate(head_outputs, axis=-1)
         
-#         return output
+        # Apply the final linear transformation
+        output = self.linear_transformation(concatenated_output, self.W_o)
+        
+        return output
 
-
-#     def linear_transformation(self, concatenated_output, weight_matrix):
-#         return np.dot(concatenated_output, weight_matrix)
-
-
+    def linear_transformation(self, concatenated_output, weight_matrix):
+        return np.dot(concatenated_output, weight_matrix)
 
 
 
 # TEST CASE!
 
-embedding_dim = 8  # example embedding dimension
-num_heads = 2  # example number of heads
-sequence_length = 4  # example sequence length
+# embedding_dim = 8  # example embedding dimension
+# num_heads = 2  # example number of heads
+# sequence_length = 4  # example sequence length
 
 # a dummy embedding matrix (shape: [sequence_length, embedding_dim])
-dummy_embeddings = np.random.rand(sequence_length, embedding_dim)
+# dummy_embeddings = np.random.rand(sequence_length, embedding_dim)
 
-# Test SelfAttention
-self_attention = SelfAttention(embedding_dim)
-self_attention_output = self_attention.forward(dummy_embeddings)
-print("SelfAttention Output:")
-print(self_attention_output)
-print("Shape:", self_attention_output.shape)
+# TEST SELF ATTENTION
+# self_attention = SelfAttention(embedding_dim)
+# self_attention_output = self_attention.forward(dummy_embeddings)
+# print("SelfAttention Output:")
+# print(self_attention_output)
+# print("Shape:", self_attention_output.shape)
 
-# # Test MultiHeadAttention
+# TEST MULTI ATTENTION
 # multi_head_attention = MultiHeadAttention(embedding_dim, num_heads)
 # multi_head_output = multi_head_attention.forward(dummy_embeddings)
 # print("MultiHeadAttention Output:")
