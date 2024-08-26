@@ -1,27 +1,11 @@
 import numpy as np
 import gensim.downloader as api
 
-
-# Goal: with a string of input (ex. a sentence), next word is predicted.
-#       Should be able to form/complete a coherent sentence
-
-
-
 # Part 1: Tokenize, embed, positional encode
-
-# Steps:
-    # Self Attention
-        # 1. Load the embedding matrix
-        # 2. Split input sentence into words (tokens)
-        # 3. Create an array of embeddings of the tokens of the input sentence
-        # 4. Add positional encoding to the token embeddings
-    # Multi-Head Attention
-        # 1. 
 
 
 # Embedding matrix
 embedding_model = api.load('glove-wiki-gigaword-300')
-
 
 def get_embedding(word: str, embedding_model) -> np.ndarray:
     if word in embedding_model:
