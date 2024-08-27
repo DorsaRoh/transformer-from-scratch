@@ -3,16 +3,6 @@ from attention import MultiHeadAttention, softmax
 from embed import tokenize_and_embed, add_positional_encoding, embedding_model
 import random
 
-
-# Part 3: Transformer architecture
-    # Input: sequence of tokens (ex. a string of sentences)
-    # Output: a probability distribution of the possible next generated tokens. If desired, the completion of the sentence
-
-# Steps:
-    # 1. Initialize instance of Multi Head Attention class with the dimensions of the embedding and number of heads
-    # 2. do rest here
-
-
 class Transformer:
     def __init__(self, embedding_dim, num_heads):
         self.embedding_dim = embedding_dim
@@ -36,16 +26,14 @@ class Transformer:
     def linear_transformation(self, x, weight_matrix):
         return np.dot(x, weight_matrix)
 
-
     # Calculate next token
     def predict_next_word(self, sentence, temperature, top_k=5):
-
         # Tokenize and embed input sentence
         embeddings = tokenize_and_embed(sentence, embedding_model)
         output = self.forward(embeddings)
         
         # Apply softmax to get probabilities
-        probs = self.softmax(output[-1] / temperature)
+        probs = softmax(output[-1] / temperature)
         
         # Sample from the top-k words instead of greedy argmax
         top_k_indices = np.argsort(probs)[-top_k:]
@@ -55,10 +43,11 @@ class Transformer:
         return next_word
     
     # Complete the sentence from given input 
-    def complete_sentence(self, sentence, max_length=20):
-        for _ in range(max_length):
-            next_word = self.predict_next_word(sentence)
-            sentence += " " + next_word
+    def complete_sentence(self, sentence, max_length=20, temperature=1.0):
+        words = sentence.split()
+        for _ in range(max_length - len(words)):
+            next_word = self.predict_next_word(" ".join(words), temperature)
             if next_word == "<EOS>":  # Assuming <EOS> is the end of sequence token
                 break
-        return sentence
+            words.append(next_word)
+        return " ".join(words)

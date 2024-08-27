@@ -11,6 +11,6 @@ num_heads = 6
 
 transformer = Transformer(embedding_dim, num_heads)
 sentence = "this is a test"
-completed_sentence = transformer.complete_sentence(sentence)
+completed_sentence = transformer.complete_sentence(sentence, temperature=1.0)
 print("Completed Sentence:")
 print(completed_sentence)
